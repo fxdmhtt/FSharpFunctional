@@ -3,17 +3,19 @@ open FSharpPlus
 
 module Itertoolz =
 
-    type GenericTail = Func with
+    type Tail =
         static member Tail (x: 'T list) = List.tail x
         static member Tail (x: 'T array) = Array.tail x
         static member Tail (x: 'T seq) = Seq.tail x
 
-    let inline tail x = 
-        let inline tail (func: ^f) (x: ^C) : 'U = 
-            ((^f or ^C) : (static member Tail : ^C -> 'U) x)
-        tail Func x
+        static member inline Invoke source =
+            let inline call_2 (a: ^a, b: ^b) = ((^a or ^b) : (static member Tail : _ -> _) b)
+            let inline call (a: 'a, b: 'b) = call_2 (a, b)
+            call (Unchecked.defaultof<Tail>, source)
 
     let inline accumulate (binop: 'a -> 'a -> 'a) seq (initial: 'a option) =
+        let inline tail source = Tail.Invoke source
+
         match initial with
         | Some init -> scan binop init seq
         | None ->
