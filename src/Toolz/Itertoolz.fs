@@ -1,6 +1,7 @@
 ﻿namespace Toolz
 open FSharpPlus
 
+[<AutoOpen>]
 module Itertoolz =
 
     let inline accumulate (binop: ^a -> ^a -> ^a) seq (initial: ^a option) =
