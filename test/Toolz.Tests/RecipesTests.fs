@@ -11,9 +11,9 @@ let iseven x = x % 2 = 0
 
 [<Fact>]
 let ``test_countby`` () =
-    countby iseven [1; 2; 3] |> should equal (Map.ofList [(true, 1); (false, 2)])
-    countby length ["cat"; "dog"; "mouse"] |> should equal (Map.ofList [(3, 2); (5, 1)])
-    countby (item 0) ["ab"; "ac"; "bc"] |> should equal (Map.ofList [('a', 2); ('b', 1)])
+    countby iseven [1; 2; 3] |> should equal (Map [ (true, 1); (false, 2) ])
+    countby length ["cat"; "dog"; "mouse"] |> should equal (Map [ (3, 2); (5, 1) ])
+    countby (item 0) ["ab"; "ac"; "bc"] |> should equal (Map [ ('a', 2); ('b', 1) ])
 
 [<Fact>]
 let ``test_partitionby`` () =

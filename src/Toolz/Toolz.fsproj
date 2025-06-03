@@ -9,8 +9,9 @@
     <Compile Include="operator.fs" />
     <Compile Include="Functools.fs" />
     <Compile Include="Itertoolz.fs" />
-    <Compile Include="Recipes.fs" />
     <Compile Include="Functoolz.fs" />
+    <Compile Include="Dicttoolz.fs" />
+    <Compile Include="Recipes.fs" />
   </ItemGroup>
 
   <ItemGroup>

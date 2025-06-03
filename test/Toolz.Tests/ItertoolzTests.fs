@@ -99,23 +99,23 @@ let ``test_first`` () =
 
 [<Fact>]
 let ``test_frequencies`` () =
-    frequencies ["cat"; "cat"; "ox"; "pig"; "pig"; "cat"] |> should equal (Map.ofList [("cat", 3); ("ox", 1); ("pig", 2)])
-    frequencies ["cat"; "pig"; "cat"; "eel"; "pig"; "dog"; "dog"; "dog"] |> should equal (Map.ofList [("cat", 2); ("eel", 1); ("pig", 2); ("dog", 3)])
-    frequencies ([]: float list) |> should equal (Map.ofList ([]: (float * int) list))
-    frequencies "onomatopoeia" |> should equal (Map.ofList [('a', 2); ('e', 1); ('i', 1); ('m', 1); ('o', 4); ('n', 1); ('p', 1); ('t', 1)])
+    frequencies ["cat"; "cat"; "ox"; "pig"; "pig"; "cat"] |> should equal (Map [ ("cat", 3); ("ox", 1); ("pig", 2) ])
+    frequencies ["cat"; "pig"; "cat"; "eel"; "pig"; "dog"; "dog"; "dog"] |> should equal (Map [ ("cat", 2); ("eel", 1); ("pig", 2); ("dog", 3) ])
+    frequencies ([]: float list) |> should equal (Map ([]: (float * int) list))
+    frequencies "onomatopoeia" |> should equal (Map [ ('a', 2); ('e', 1); ('i', 1); ('m', 1); ('o', 4); ('n', 1); ('p', 1); ('t', 1) ])
 
 let ``test_get`` () =
     get 1 "ABC" |> should equal 'B'
     // get [1; 2] "ABC" |> should equal ['B'; 'C']
 
-    let phonebook = Map.ofList [("Alice", "555-1234"); ("Bob", "555-5678"); ("Charlie", "555-9999")]
+    let phonebook = Map [ ("Alice", "555-1234"); ("Bob", "555-5678"); ("Charlie", "555-9999") ]
     get "Alice" phonebook |> should equal "555-1234"
     // get ["Alice"; "Bob"] phonebook |> should equal ["555-1234"; "555-5678"]
     // get ["Alice"; "Dennis"] phonebook |> should equal ["555-1234"; None]
 
     get 1 "ABCDE" |> should equal 'B'
     // assert list(get([1, 3], 'ABCDE')) == list('BD')
-    get 'a' (Map.ofList [('a', 1); ('b', 2); ('c', 3)]) |> should equal 1
+    get 'a' (Map [ ('a', 1); ('b', 2); ('c', 3) ]) |> should equal 1
     // assert get(['a', 'b'], {'a': 1, 'b': 2, 'c': 3}) == (1, 2)
 
     // assert get('foo', {}, default='bar') == 'bar'
@@ -133,10 +133,10 @@ let ``test_get`` () =
 
 [<Fact>]
 let ``test_groupby`` () =
-    groupby length ["Alice"; "Bob"; "Charlie"; "Dan"; "Edith"; "Frank"] |> should equal (Map.ofList [(3, ["Bob"; "Dan"]); (5, ["Alice"; "Edith"; "Frank"]); (7, ["Charlie"])])
-    groupby iseven [1; 2; 3; 4; 5; 6; 7; 8] |> should equal (Map.ofList [(false, [1; 3; 5; 7]); (true, [2; 4; 6; 8])])
-    groupby (item "gender") [Map.ofList [("name", "Alice"); ("gender", "F")]; Map.ofList [("name", "Bob"); ("gender", "M")]; Map.ofList [("name", "Charlie"); ("gender", "M")]] |> should equal (Map.ofList [("F", [Map.ofList [("gender", "F"); ("name", "Alice")]]); ("M", [Map.ofList [("gender", "M"); ("name", "Bob")]; Map.ofList [("gender", "M"); ("name", "Charlie")]])])
-    groupby iseven [1; 2; 3; 4] |> should equal (Map.ofList [(true, [2; 4]); (false, [1; 3])])
+    groupby length ["Alice"; "Bob"; "Charlie"; "Dan"; "Edith"; "Frank"] |> should equal (Map [ (3, ["Bob"; "Dan"]); (5, ["Alice"; "Edith"; "Frank"]); (7, ["Charlie"]) ])
+    groupby iseven [1; 2; 3; 4; 5; 6; 7; 8] |> should equal (Map [ (false, [1; 3; 5; 7]); (true, [2; 4; 6; 8]) ])
+    groupby (item "gender") [Map [ ("name", "Alice"); ("gender", "F") ]; Map [ ("name", "Bob"); ("gender", "M") ]; Map [ ("name", "Charlie"); ("gender", "M") ]] |> should equal (Map [ ("F", [Map [ ("gender", "F"); ("name", "Alice") ]]); ("M", [Map [ ("gender", "M"); ("name", "Bob") ]; Map [ ("gender", "M"); ("name", "Charlie") ]]) ])
+    groupby iseven [1; 2; 3; 4] |> should equal (Map [ (true, [2; 4]); (false, [1; 3]) ])
 
 [<Fact>]
 let ``test_interleave`` () =
@@ -317,8 +317,8 @@ let ``test_random_sample`` () =
 [<Fact>]
 let ``test_reduceby`` () =
     let data = [1; 2; 3; 4; 5]
-    reduceby iseven add data None |> should equal (Map.ofList [(false, 9); (true, 6)])
-    reduceby iseven mul data None |> should equal (Map.ofList [(false, 15); (true, 8)])
+    reduceby iseven add data None |> should equal (Map [ (false, 9); (true, 6) ])
+    reduceby iseven mul data None |> should equal (Map [ (false, 15); (true, 8) ])
 
 [<Fact>]
 let ``test_remove`` () =
@@ -335,15 +335,15 @@ let ``test_second`` () =
 
 [<Fact>]
 let ``test_sliding_window`` () =
-    sliding_window 2 [1; 2; 3; 4] |> toList |> should equal [[|1; 2|]; [|2; 3|]; [|3; 4|]]
-    sliding_window 3 [1; 2; 3; 4] |> toList |> should equal [[|1; 2; 3|]; [|2; 3; 4|]]
+    sliding_window 2 [1; 2; 3; 4] |> toList |> should equal [[| 1; 2 |]; [| 2; 3 |]; [| 3; 4 |]]
+    sliding_window 3 [1; 2; 3; 4] |> toList |> should equal [[| 1; 2; 3 |]; [| 2; 3; 4 |]]
 
 [<Fact>]
 let ``test_tail`` () =
     tail 2 [10; 20; 30; 40; 50] |> should equal [40; 50]
     tail 3 "ABCDE" |> should equal "CDE"
     // assert list(tail(3, iter('ABCDE'))) == list('CDE')
-    tail 2 [|3; 2; 1|] |> should equal [|2; 1|]
+    tail 2 [| 3; 2; 1 |] |> should equal [| 2; 1 |]
 
 [<Fact>]
 let ``test_take_nth`` () =
@@ -359,9 +359,9 @@ let ``test_topk`` () =
     topk 2 [4; 1; 5; 2] ((-) 0) |> should equal [1; 2]
     topk 2 (seq { 5; 1; 4; 2 }) ((-) 0) |> toList |> should equal [1; 2]
 
-    topk 2 [ Map.ofList [("a", 1); ("b", 10)]; Map.ofList [("a", 2); ("b", 9)]; Map.ofList [("a", 10); ("b", 1)]; Map.ofList [("a", 9); ("b", 2)] ] (item "a") |> should equal [Map.ofList [("a", 10); ("b", 1)]; Map.ofList [("a", 9); ("b", 2)]]
+    topk 2 [ Map [ ("a", 1); ("b", 10) ]; Map [ ("a", 2); ("b", 9) ]; Map [ ("a", 10); ("b", 1) ]; Map [ ("a", 9); ("b", 2) ] ] (item "a") |> should equal [Map [ ("a", 10); ("b", 1) ]; Map [ ("a", 9); ("b", 2) ]]
 
-    topk 2 [ Map.ofList [("a", 1); ("b", 10)]; Map.ofList [("a", 2); ("b", 9)]; Map.ofList [("a", 10); ("b", 1)]; Map.ofList [("a", 9); ("b", 2)] ] (item "b") |> should equal [Map.ofList [("a", 1); ("b", 10)]; Map.ofList [("a", 2); ("b", 9)]]
+    topk 2 [ Map [ ("a", 1); ("b", 10) ]; Map [ ("a", 2); ("b", 9) ]; Map [ ("a", 10); ("b", 1) ]; Map [ ("a", 9); ("b", 2) ] ] (item "b") |> should equal [Map [ ("a", 1); ("b", 10) ]; Map [ ("a", 2); ("b", 9) ]]
     topk 2 [(0, 4); (1, 3); (2, 2); (3, 1); (4, 0)] fst |> should equal [(4, 0); (3, 1)]
 
 [<Fact>]

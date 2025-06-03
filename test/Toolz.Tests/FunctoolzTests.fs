@@ -48,7 +48,7 @@ let ``test_flip`` () =
 let ``test_flip_property`` (a: float) (b: float) =
     let f a b = a, b
 
-    if System.Double.IsNaN(a) || System.Double.IsNaN(b) then 
+    if Double.IsNaN(a) || Double.IsNaN(b) then 
         true
     else
         flip f a b = (b, a)
