@@ -10,21 +10,22 @@ module Dicttoolz =
     let inline dissoc (d: Map<'Key, 'Value>) (keys: '``Collection<'Key>``) : Map<'Key, 'Value> =
         keys |> fold (flip Map.remove) d
 
-    let inline itemfilter (predicate: 'Key -> 'Value -> bool) (d: Map<'Key, 'Value>) : Map<'Key, 'Value> =
-        d |> Map.filter predicate
+    let inline itemfilter (predicate: 'Key * 'Value -> bool) (d: Map<'Key, 'Value>) : Map<'Key, 'Value> =
+        d |> Map.filter (curry predicate)
 
     let inline itemmap (func: 'TKey1 * 'TValue1 -> 'TKey2 * 'TValue2) (d: Map<'TKey1, 'TValue1>) : Map<'TKey2, 'TValue2> =
         d
-        |> Map.map (fun x y -> func (x, y))
+        |> Map.map (curry func)
         |> Map.values
         |> Map.ofSeq
 
     let inline keyfilter (predicate: 'Key -> bool) (d: Map<'Key, 'Value>) : Map<'Key, 'Value> =
-        d |> Map.filter (fun k _ -> predicate k)
+        // d |> Map.filter (fun k _ -> predicate k)
+        d |> Map.filter (curry (item1 >> predicate))
 
     let inline keymap (func: 'T1 -> 'T2) (d: Map<'T1, 'Value>) : Map<'T2, 'Value> =
         d
-        |> Map.map (fun k v -> func k, v)
+        |> Map.map (curry (Tuple2.mapItem1 func))
         |> Map.values
         |> Map.ofSeq
 
@@ -40,7 +41,7 @@ module Dicttoolz =
         |> Map.mapValues func
 
     let inline valfilter (predicate: 'Value -> bool) (d: Map<'Key, 'Value>) : Map<'Key, 'Value> =
-        d |> Map.filter (fun _ v -> predicate v)
+        d |> Map.filter (curry (item2 >> predicate))
 
     let inline valmap (func: 'T1 -> 'T2) (d: Map<'Key, 'T1>) : Map<'Key, 'T2> =
         d |> Map.mapValues func
