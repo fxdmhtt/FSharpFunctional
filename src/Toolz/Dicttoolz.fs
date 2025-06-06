@@ -34,10 +34,11 @@ module Dicttoolz =
         |> rev
         |> fold Map.union Map.empty
 
-    let inline merge_with (func: 'Value list -> 'TValue) (dicts: '``Collection<Map<'Key, 'Value>>``) : Map<'Key, 'TValue> =
+    // let inline merge_with (func: 'Value list -> 'TValue) (dicts: '``Collection<Map<'Key, 'Value>>``) : Map<'Key, 'TValue> =
+    let inline merge_with (func: 'Value list -> 'TValue) dicts : Map<'Key, 'TValue> =
         dicts
-        |> map (Map.mapValues (fun x -> [ x ]))
-        |> fold (Map.unionWith List.append) Map.empty
+        |> map (Map.mapValues result)
+        |> fold (Map.unionWith (@)) Map.empty
         |> Map.mapValues func
 
     let inline valfilter (predicate: 'Value -> bool) (d: Map<'Key, 'Value>) : Map<'Key, 'Value> =

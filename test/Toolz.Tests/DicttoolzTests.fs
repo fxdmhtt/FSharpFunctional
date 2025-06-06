@@ -84,13 +84,13 @@ let ``test_merge_with`` () =
 
     let dicts = [ Map [ 1, 1; 2, 2 ]; Map [ 1, 10; 2, 20 ] ]
     merge_with sum dicts |> should equal (Map [ 1, 11; 2, 22 ])
-    merge_with toTuple dicts |> should equal (Map [ 1, (1, 10); 2, (2, 20) ])
+    merge_with toArray dicts |> should equal (Map [ 1, [| 1; 10 |]; 2, [| 2; 20 |] ])
 
     let dicts = [ Map [ 1, 1; 2, 2; 3, 3 ]; Map [ 1, 10; 2, 20 ] ]
     merge_with sum dicts |> should equal (Map [ 1, 11; 2, 22; 3, 3 ])
-    merge_with toTuple dicts |> should equal (Map [ 1, (1, 10); 2, (2, 20); 3, (3,) ])
+    merge_with toArray dicts |> should equal (Map [ 1, [| 1; 10 |]; 2, [| 2; 20 |]; 3, [| 3 |] ])
 
-    merge_with sum [] |> length |> should equal 0
+    merge_with sum ([] : Map<int, int> list) |> length |> should equal 0
 
 [<Fact>]
 let ``test_valfilter`` () =
