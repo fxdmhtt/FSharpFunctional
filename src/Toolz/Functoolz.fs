@@ -2,11 +2,8 @@
 
 module Functoolz =
 
-    let inline complement func =
+    let inline complement (func: 'T -> bool) : 'T -> bool =
         not << func
 
-    let inline flip func a b =
-        func b a
-
-    let inline identity x =
+    let inline identity (x: 'T) : 'T =
         x

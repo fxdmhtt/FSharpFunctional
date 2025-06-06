@@ -4,7 +4,7 @@ open FSharpPlus
 [<AutoOpen>]
 module Itertoolz =
 
-    let inline accumulate (binop: ^a -> ^a -> ^a) seq (initial: ^a option) =
+    let inline accumulate (binop: 'State -> 'T -> 'State) (seq: '``Collection<'T>``) (initial: 'State option) : '``Collection<'State>`` =
         match initial with
         | Some init -> scan binop init seq
         | None ->
@@ -12,62 +12,64 @@ module Itertoolz =
             | Some head -> scan binop head (skip 1 seq)
             | None -> empty
 
-    let inline concat seqs =
+    let inline concat (seqs: '``Collection<'Collection<'T>>``) : '``Collection<'T>`` =
         seqs |> sum
 
-    let inline cons el seq =
+    let inline cons (el: 'T) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
         result el ++ seq
 
-    let inline count seq =
+    let inline count (seq: '``Collection<'T>``) : int =
         length seq
 
-    let inline diff seqs =
+    let inline diff (seqs: '``Collection<'Collection<'T>>``) (key: 'T -> 'Key when 'Key : equality) : '``Collection<'T>`` =
         seqs
         |> transpose
         |> fun xs ->
             xs
-            // |> map (map key)
+            |> map (map key)
             |> map (Seq.countBy id)
             |> map (length >> (<>) 1)
             |> zip xs
         |> filter snd
         |> map fst
 
-    let inline drop n seq =
+    let inline drop (n: int) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
         drop n seq
 
-    let inline first seq =
+    let inline first (seq: '``Collection<'T>``) : 'T =
         head seq
 
-    let inline frequencies seq =
+    let inline frequencies (seq: '``Collection<'T>``) : Map<'T, int> =
         seq |> Seq.countBy id |> Map.ofSeq
 
-    let inline get ind seq =
+    let inline get (ind: 'Index) (seq: '``Collection<'T>``) : 'T =
         item ind seq
 
-    let inline groupby key seq =
+    // let inline groupby (key: 'T -> 'Key when 'Key : equality) (seq: '``Collection<'T>``) : Map<'Key, '``Collection<'T>``> =
+    let inline groupby (key: 'T -> 'Key when 'Key : equality) (seq: '``Collection<'T>``) =
         seq
         |> groupBy key
         |> Map.ofSeq
 
-    let inline interleave seqs =
+    let inline interleave (seqs: '``Collection<'Collection<'T>>``) : '``Collection<'T>`` =
         seqs
         |> transpose
         |> sum
 
-    let inline interpose (el: ^a) (seq: ^a seq) : ^a seq =
+    // let inline interpose (el: 'T) (seq: '``Collection<'T>``) : 'T seq =
+    let inline interpose (el: 'T) (seq: 'T seq) : 'T seq =
         seq
-        |> map (fun (x: ^a) -> Operators.seq {el; x})
+        |> map (fun (x: 'T) -> Operators.seq { el; x })
         |> sum
         |> drop 1
 
-    let inline isdistinct seq =
+    let inline isdistinct (seq: '``Collection<'T>``) : bool =
         seq
         |> Seq.countBy id
         |> Seq.map snd
         |> Seq.forall ((=) 1)
 
-    let inline iterate func x =
+    let inline iterate (func: 'T -> 'T) (x: 'T) : 'T seq =
         seq {
             let mutable current = x
             while true do
@@ -75,7 +77,7 @@ module Itertoolz =
                 current <- func current
         }
 
-    let inline join leftkey leftseq rightkey rightseq =
+    let inline join (leftkey: 'T -> 'Key when 'Key : equality) (leftseq: '``Collection<'T>``) (rightkey: 'U -> 'Key when 'Key : equality) (rightseq: '``Collection<'U>``) : ('T * 'U) seq =
         let d = groupby leftkey leftseq
 
         seq {
@@ -88,74 +90,78 @@ module Itertoolz =
                 | None -> ()
         }
 
-    let inline last seq =
+    let inline last (seq: '``Collection<'T>``) : 'T =
         seq |> rev |> head
 
+    // let inline mapcat (func: '``Collection<'T>`` -> '``Collection<'U>``) (seqs: '``Collection<'Collection<'T>>``) : '``Collection<'U>`` =
     let inline mapcat func seqs =
         seqs
         |> map func
         |> concat
 
-    let inline nth n seq =
+    let inline nth (n: int) (seq: '``Collection<'T>``) : 'T =
         seq |> skip n |> head
 
-    let inline partition n seq =
+    let inline partition (n: int) (seq: '``Collection<'T>``) : 'T list seq =
         seq
         |> Seq.chunkBySize n
         |> map Seq.toList
         |> filter (length >> (=) n)
 
-    let inline partition_all n seq =
+    let inline partition_all (n: int) (seq: '``Collection<'T>``) : 'T list seq =
         seq
         |> Seq.chunkBySize n
         |> map Seq.toList
 
-    let inline peek seq =
+    let inline peek (seq: '``Collection<'T>``) : 'T * '``Collection<'T>`` =
         head seq, seq
 
-    let inline peekn n seq =
+    let inline peekn (n: int) (seq: '``Collection<'T>``) : '``Collection<'T>`` * '``Collection<'T>`` =
         take n seq, seq
 
+    //let inline pluck (ind: 'Index) (seqs: '``Collection<'Indexed<'T>>``) : '``Collection<'T>`` =
     let inline pluck ind seqs =
         seqs
         |> map (item ind)
 
-    let inline random_sample prob seq =
+    let inline random_sample (prob: float) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
         seq
         |> filter (fun _ -> System.Random().NextDouble() < prob)
 
-    let inline reduceby key (binop: ^a -> ^a -> ^a) seq (init: ^a option) =
+    // let inline reduceby (key: 'T -> 'Key when 'Key : equality) (binop: 'State -> 'T -> 'State) (seq: '``Collection<'T>``) (init: 'State option) : Map<'Key, 'State> =
+    let inline reduceby key binop seq init =
         seq
         |> groupby key
-        |> Map.map (fun _ group -> Functools.reduce binop group init)
+        |> Map.mapValues (fun group -> Functools.reduce binop group init)
 
-    let inline remove predicate seq =
+    let inline remove (predicate: 'T -> bool) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
         seq
         |> filter (not << predicate)
 
-    let inline second seq =
+    let inline second (seq: '``Collection<'T>``) : 'T =
         seq |> drop 1 |> head
 
-    let inline sliding_window n seq =
+    let inline sliding_window (n: int) (seq: '``Collection<'T>``) : 'T array seq =
         seq
         |> Seq.windowed n
 
-    let inline tail n seq =
+    let inline tail (n: int) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
         seq
         |> skip (length seq - n)
 
+    // let inline take_nth (n: int) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
     let inline take_nth n seq =
         seq
         |> mapi (fun i x -> x, i % n = 0)
         |> filter snd
         |> map fst
 
-    let inline topk k seq key =
+    let inline topk k (seq: '``Collection<'T>``) (key: 'T -> 'Key when 'Key : equality) : '``Collection<'T>`` =
         seq
         |> sortByDescending key
         |> take k
 
-    let inline unique seq key =
+    let inline unique (seq: '``Collection<'T>``) (key: 'T -> 'Key when 'Key : equality) : '``Collection<'T>`` =
         seq
         |> groupBy key
         |> map snd

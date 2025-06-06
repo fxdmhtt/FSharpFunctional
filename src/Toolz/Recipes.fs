@@ -4,7 +4,7 @@ open FSharpPlus
 [<AutoOpen>]
 module Recipes =
 
-    let inline countby (key: 'T -> 'Key when 'Key : equality) (seq: '``Collection<'T>``) =
+    let inline countby (key: 'T -> 'Key when 'Key : equality) (seq: '``Collection<'T>``) : Map<'Key, int> =
         seq
         |> Seq.countBy key
         |> Map.ofSeq

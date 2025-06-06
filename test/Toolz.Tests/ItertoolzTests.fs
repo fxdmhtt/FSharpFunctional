@@ -5,7 +5,6 @@ open Xunit
 open FSharpPlus
 open FsUnit.Xunit
 open FsCheck.Xunit
-open operator
 open Toolz.Itertoolz
 
 let identity x = x
@@ -16,10 +15,10 @@ let double x = 2 * x
 
 [<Fact>]
 let ``test_accumulate`` () =
-    accumulate add [1; 2; 3; 4; 5] None |> should equal [1; 3; 6; 10; 15]
-    accumulate mul [1; 2; 3; 4; 5] None |> should equal [1; 2; 6; 24; 120]
-    accumulate add [1; 2; 3; 4; 5] (Some -1) |> should equal [-1; 0; 2; 5; 9; 14]
-    accumulate add [] (Some 1) |> should equal [1]
+    accumulate (+) [1; 2; 3; 4; 5] None |> should equal [1; 3; 6; 10; 15]
+    accumulate (*) [1; 2; 3; 4; 5] None |> should equal [1; 2; 6; 24; 120]
+    accumulate (+) [1; 2; 3; 4; 5] (Some -1) |> should equal [-1; 0; 2; 5; 9; 14]
+    accumulate (+) [] (Some 1) |> should equal [1]
 
     let binop a b =
         System.Diagnostics.Debug.Assert(false, "binop should not be called")
@@ -52,8 +51,8 @@ let ``test_count`` () =
 
 [<Fact>]
 let ``test_diff`` () =
-    diff [[1; 2; 3]; [1; 2; 10; 100]] |> should equal [[3; 10]]
-    // diff [["apples"; "bananas"]; ["Apples"; "Oranges"]] (fun (x: string) -> x.ToUpper()) |> should equal [["bananas"; "Oranges"]]
+    diff [[1; 2; 3]; [1; 2; 10; 100]] id |> should equal [[3; 10]]
+    diff [["apples"; "bananas"]; ["Apples"; "Oranges"]] (fun (x: string) -> x.ToUpper()) |> should equal [["bananas"; "Oranges"]]
 
     // assert raises(TypeError, lambda: list(diff()))
     // assert raises(TypeError, lambda: list(diff([1, 2])))
@@ -61,14 +60,14 @@ let ``test_diff`` () =
     // assert list(diff([1, 2], (1, 2), iter([1, 2]))) == []
     // assert list(diff([1, 2, 3], (1, 10, 3), iter([1, 2, 10]))) == [
     //     (2, 10, 2), (3, 3, 10)]
-    diff [[1; 2]; [10]] |> should equal [[1; 10]]
+    diff [[1; 2]; [10]] id |> should equal [[1; 10]]
     // assert list(diff([1, 2], [10], default=None)) == [(1, 10), (2, None)]
     // # non-variadic usage
     // assert raises(TypeError, lambda: list(diff([])))
     // assert raises(TypeError, lambda: list(diff([[]])))
     // assert raises(TypeError, lambda: list(diff([[1, 2]])))
     // assert raises(TypeError, lambda: list(diff([[1, 2], 3])))
-    diff [[1; 2]; [1; 3]] |> should equal [[2; 3]]
+    diff [[1; 2]; [1; 3]] id |> should equal [[2; 3]]
 
     // data1 = [{'cost': 1, 'currency': 'dollar'},
     //          {'cost': 2, 'currency': 'dollar'}]
@@ -317,8 +316,8 @@ let ``test_random_sample`` () =
 [<Fact>]
 let ``test_reduceby`` () =
     let data = [1; 2; 3; 4; 5]
-    reduceby iseven add data None |> should equal (Map [ (false, 9); (true, 6) ])
-    reduceby iseven mul data None |> should equal (Map [ (false, 15); (true, 8) ])
+    reduceby iseven (+) data None |> should equal (Map [ (false, 9); (true, 6) ])
+    reduceby iseven (*) data None |> should equal (Map [ (false, 15); (true, 8) ])
 
 [<Fact>]
 let ``test_remove`` () =

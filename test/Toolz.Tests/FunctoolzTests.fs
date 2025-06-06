@@ -2,6 +2,7 @@
 
 open System
 open Xunit
+open FSharpPlus
 open FsUnit.Xunit
 open FsCheck.Xunit
 open Toolz.Functoolz
@@ -38,17 +39,9 @@ let ``test_complement`` () =
     // assert not complement(lambda: 1)()
     // assert not complement(lambda: [1])()
 
-[<Fact>]
-let ``test_flip`` () =
-    let f a b = a, b
-    
-    flip f 'a' 'b' |> should equal ('b', 'a')
-
 [<Property>]
-let ``test_flip_property`` (a: float) (b: float) =
-    let f a b = a, b
-
-    if Double.IsNaN(a) || Double.IsNaN(b) then 
+let ``test_identity`` (x: float) =
+    if Double.IsNaN x then 
         true
     else
-        flip f a b = (b, a)
+        identity x = x

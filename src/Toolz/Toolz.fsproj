@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="operator.fs" />
     <Compile Include="Functools.fs" />
     <Compile Include="Itertoolz.fs" />
     <Compile Include="Functoolz.fs" />

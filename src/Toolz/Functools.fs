@@ -4,7 +4,7 @@ open FSharpPlus
 [<AutoOpen>]
 module Functools =
 
-    let inline reduce (function': ^a -> ^a -> ^a) iterable (initial: ^a option) =
+    let inline reduce (function': 'State -> 'T -> 'State) (iterable: '``Collection<'T>``) (initial: 'State option) : 'State =
         match initial with
         | Some init -> fold function' init iterable
         | None ->
