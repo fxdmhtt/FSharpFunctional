@@ -56,11 +56,9 @@ module Itertoolz =
         |> transpose
         |> sum
 
-    let inline interpose (el: 'T) (seq: '``Collection<'T>``) : 'T seq =
-        seq
-        |> Seq.map (fun (x: 'T) -> Operators.seq { el; x })
-        |> sum
-        |> drop 1
+    // let inline interpose (el: 'T) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
+    let inline interpose (el: 'T) seq =
+        seq |> intersperse el
 
     let inline isdistinct (seq: '``Collection<'T>``) : bool =
         seq
