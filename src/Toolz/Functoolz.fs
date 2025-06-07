@@ -1,5 +1,6 @@
 ﻿namespace Toolz
 
+[<AutoOpen>]
 module Functoolz =
 
     let inline complement (func: 'T -> bool) : 'T -> bool =

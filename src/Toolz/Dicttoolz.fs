@@ -20,7 +20,6 @@ module Dicttoolz =
         |> Map.ofSeq
 
     let inline keyfilter (predicate: 'Key -> bool) (d: Map<'Key, 'Value>) : Map<'Key, 'Value> =
-        // d |> Map.filter (fun k _ -> predicate k)
         d |> Map.filter (curry (item1 >> predicate))
 
     let inline keymap (func: 'T1 -> 'T2) (d: Map<'T1, 'Value>) : Map<'T2, 'Value> =

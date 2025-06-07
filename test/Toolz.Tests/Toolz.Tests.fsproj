@@ -6,8 +6,11 @@
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
-  <ItemGroup><Compile Include="DicttoolzTests.fs" /><Compile Include="ItertoolzTests.fs" /><Compile Include="RecipesTests.fs" />
+  <ItemGroup>
+    <Compile Include="ItertoolzTests.fs" />
     <Compile Include="FunctoolzTests.fs" />
+    <Compile Include="DicttoolzTests.fs" />
+    <Compile Include="RecipesTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

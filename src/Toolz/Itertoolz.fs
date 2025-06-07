@@ -56,10 +56,9 @@ module Itertoolz =
         |> transpose
         |> sum
 
-    // let inline interpose (el: 'T) (seq: '``Collection<'T>``) : 'T seq =
-    let inline interpose (el: 'T) (seq: 'T seq) : 'T seq =
+    let inline interpose (el: 'T) (seq: '``Collection<'T>``) : 'T seq =
         seq
-        |> map (fun (x: 'T) -> Operators.seq { el; x })
+        |> Seq.map (fun (x: 'T) -> Operators.seq { el; x })
         |> sum
         |> drop 1
 
@@ -94,7 +93,7 @@ module Itertoolz =
         seq |> rev |> head
 
     // let inline mapcat (func: '``Collection<'T>`` -> '``Collection<'U>``) (seqs: '``Collection<'Collection<'T>>``) : '``Collection<'U>`` =
-    let inline mapcat func seqs =
+    let inline mapcat (func: '``Collection<'T>`` -> '``Collection<'U>``) seqs : '``Collection<'U>`` =
         seqs
         |> map func
         |> concat
@@ -119,8 +118,8 @@ module Itertoolz =
     let inline peekn (n: int) (seq: '``Collection<'T>``) : '``Collection<'T>`` * '``Collection<'T>`` =
         take n seq, seq
 
-    //let inline pluck (ind: 'Index) (seqs: '``Collection<'Indexed<'T>>``) : '``Collection<'T>`` =
-    let inline pluck ind seqs =
+    // let inline pluck (ind: 'Index) (seqs: '``Collection<'Indexed<'T>>``) : '``Collection<'T>`` =
+    let inline pluck (ind: 'Index) seqs : '``Collection<'T>`` =
         seqs
         |> map (item ind)
 
@@ -129,7 +128,7 @@ module Itertoolz =
         |> filter (fun _ -> System.Random().NextDouble() < prob)
 
     // let inline reduceby (key: 'T -> 'Key when 'Key : equality) (binop: 'State -> 'T -> 'State) (seq: '``Collection<'T>``) (init: 'State option) : Map<'Key, 'State> =
-    let inline reduceby key binop seq init =
+    let inline reduceby key binop seq (init: 'State option) : Map<'Key, 'State> =
         seq
         |> groupby key
         |> Map.mapValues (fun group -> Functools.reduce binop group init)
@@ -150,13 +149,13 @@ module Itertoolz =
         |> skip (length seq - n)
 
     // let inline take_nth (n: int) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
-    let inline take_nth n seq =
+    let inline take_nth (n: int) seq : '``Collection<'T>`` =
         seq
         |> mapi (fun i x -> x, i % n = 0)
         |> filter snd
         |> map fst
 
-    let inline topk k (seq: '``Collection<'T>``) (key: 'T -> 'Key when 'Key : equality) : '``Collection<'T>`` =
+    let inline topk (k: int) (seq: '``Collection<'T>``) (key: 'T -> 'Key when 'Key : equality) : '``Collection<'T>`` =
         seq
         |> sortByDescending key
         |> take k
