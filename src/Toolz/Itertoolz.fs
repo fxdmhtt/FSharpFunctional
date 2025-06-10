@@ -1,5 +1,6 @@
 ﻿namespace Toolz
 open FSharpPlus
+open FSharpPlus.Data
 
 [<AutoOpen>]
 module Itertoolz =
@@ -129,7 +130,15 @@ module Itertoolz =
     let inline reduceby key binop seq (init: 'State option) : Map<'Key, 'State> =
         seq
         |> groupby key
-        |> Map.mapValues (fun group -> Functools.reduce binop group init)
+        |> Map.mapValues (fun group ->
+            match init with
+            | Some initial -> fold binop initial seq
+            | None ->
+                group
+                |> NonEmptySeq.tryOfSeq
+                |> Option.map (NonEmptySeq.reduce binop)
+                |> Option.defaultValue Unchecked.defaultof<'State>
+        )
 
     let inline remove (predicate: 'T -> bool) (seq: '``Collection<'T>``) : '``Collection<'T>`` =
         seq

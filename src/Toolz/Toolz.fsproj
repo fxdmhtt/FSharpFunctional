@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Functools.fs" />
     <Compile Include="Itertoolz.fs" />
     <Compile Include="Functoolz.fs" />
     <Compile Include="Dicttoolz.fs" />
