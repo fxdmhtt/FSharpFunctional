@@ -5,31 +5,31 @@ open FSharpPlus
 [<AutoOpen>]
 module Math =
 
-    let inline add x1 x2 = x1 + x2
+    let inline add a b = a + b
 
-    let inline dec x = x - one
+    let inline dec n = n - one
 
-    let inline divide x1 x2 = div x1 x2
+    let inline divide a b = div a b
 
-    let inline inc x = x + one
+    let inline inc n = n + one
 
-    let inline mathMod x1 x2 =
-        let y = x1 % x2
-        if y < 0 then y + abs x2 else y
+    let inline mathMod m p =
+        let y = m % p
+        if y < 0 then y + abs p else y
 
-    let inline mean (xs: 'T seq) : double =
-        if Seq.isEmpty xs then
+    let inline mean (list: 'T seq) : double =
+        if Seq.isEmpty list then
             nan
         else
-            let sum = Seq.sum xs
-            let count = Seq.length xs
+            let sum = Seq.sum list
+            let count = Seq.length list
             div (double sum) (double count)
 
-    let inline median (xs: 'T seq) : double =
-        if Seq.isEmpty xs then
+    let inline median (list: 'T seq) : double =
+        if Seq.isEmpty list then
             nan
         else
-            let sorted = xs |> Seq.sort |> Seq.toArray
+            let sorted = list |> Seq.sort |> Seq.toArray
             let n = Array.length sorted
 
             if n % 2 = 1 then
@@ -39,14 +39,14 @@ module Math =
                 let mid2 = sorted.[n / 2]
                 (double mid1 + double mid2) / 2.0
 
-    let inline modulo x1 x2 = x1 % x2
+    let inline modulo a b = a % b
 
-    let inline multiply x1 x2 = x1 * x2
+    let inline multiply a b = a * b
 
-    let inline negate x = -x
+    let inline negate n = -n
 
-    let inline product (xs: 'T seq) : 'T = Seq.fold (*) one xs
+    let inline product (list: 'T seq) : 'T = Seq.fold (*) one list
 
-    let inline subtract x1 x2 = x1 - x2
+    let inline subtract a b = a - b
 
-    let inline sum (xs: 'T seq) : 'T = Seq.fold (+) Unchecked.defaultof<'T> xs
+    let inline sum (list: 'T seq) : 'T = Seq.fold (+) Unchecked.defaultof<'T> list
