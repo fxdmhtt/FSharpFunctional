@@ -3,8 +3,6 @@
 [<AutoOpen>]
 module Functoolz =
 
-    let inline complement (func: 'T -> bool) : 'T -> bool =
-        not << func
+    let inline complement (func: 'T -> bool) : 'T -> bool = not << func
 
-    let inline identity (x: 'T) : 'T =
-        x
+    let inline identity (x: 'T) : 'T = x

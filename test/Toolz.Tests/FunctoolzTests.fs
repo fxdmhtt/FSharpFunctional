@@ -5,7 +5,7 @@ open Xunit
 open FSharpPlus
 open FsUnit.Xunit
 open FsCheck.Xunit
-open Toolz.Functoolz
+open Toolz
 
 let iseven x = x % 2 = 0
 let isodd x = x % 2 = 1
@@ -24,24 +24,21 @@ let ``test_complement`` () =
     complement (complement iseven) 2 |> should be True
     complement (complement isodd) 2 |> should be False
 
-    // Multiple arities:
-    // both_even = lambda a, b: iseven(a) and iseven(b)
-    // assert complement(both_even)(1, 2)
-    // assert not complement(both_even)(2, 2)
+// Multiple arities:
+// both_even = lambda a, b: iseven(a) and iseven(b)
+// assert complement(both_even)(1, 2)
+// assert not complement(both_even)(2, 2)
 
-    // Generic truthiness:
-    // assert complement(lambda: "")()
-    // assert complement(lambda: 0)()
-    // assert complement(lambda: None)()
-    // assert complement(lambda: [])()
+// Generic truthiness:
+// assert complement(lambda: "")()
+// assert complement(lambda: 0)()
+// assert complement(lambda: None)()
+// assert complement(lambda: [])()
 
-    // assert not complement(lambda: "x")()
-    // assert not complement(lambda: 1)()
-    // assert not complement(lambda: [1])()
+// assert not complement(lambda: "x")()
+// assert not complement(lambda: 1)()
+// assert not complement(lambda: [1])()
 
 [<Property>]
 let ``test_identity`` (x: float) =
-    if Double.IsNaN x then 
-        true
-    else
-        identity x = x
+    if Double.IsNaN x then true else identity x = x
