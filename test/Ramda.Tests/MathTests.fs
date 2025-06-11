@@ -5,7 +5,7 @@ open Xunit
 open FSharpPlus
 open FsUnit.Xunit
 open FsCheck.Xunit
-open Ramda.Math
+open Ramda
 
 [<Fact>]
 let ``test_add`` () =
