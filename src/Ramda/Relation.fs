@@ -44,14 +44,14 @@ module Relation =
 
     let inline max (a: 'T) (b: 'T) : 'T = if a > b then a else b
 
-    let inline maxBy (f: 'T -> _) (a: 'T) (b: 'T) : 'T =
+    let inline maxBy (f: 'T -> 'Key when 'Key: equality) (a: 'T) (b: 'T) : 'T =
         let a' = f a
         let b' = f b
         if a' > b' then a else b
 
     let inline min (a: 'T) (b: 'T) : 'T = if a < b then a else b
 
-    let inline minBy (f: 'T -> _) (a: 'T) (b: 'T) : 'T =
+    let inline minBy (f: 'T -> 'Key when 'Key: equality) (a: 'T) (b: 'T) : 'T =
         let a' = f a
         let b' = f b
         if a' < b' then a else b

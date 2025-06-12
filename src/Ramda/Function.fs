@@ -11,7 +11,7 @@ module Function =
 
     let inline applyTo x f = f x
 
-    let inline ascend (fn: 'T -> _) : 'T -> 'T -> int = fun x y -> compare (fn x) (fn y)
+    let inline ascend (fn: 'T -> 'Key when 'Key: equality) : 'T -> 'T -> int = fun x y -> compare (fn x) (fn y)
 
     let inline comparator (pred: 'T -> 'T -> bool) : 'T -> 'T -> int =
         fun x y ->
@@ -19,7 +19,7 @@ module Function =
             else if pred y x then 1
             else 0
 
-    let inline descend (fn: 'T -> _) : 'T -> 'T -> int = fun x y -> compare (fn y) (fn x)
+    let inline descend (fn: 'T -> 'Key when 'Key: equality) : 'T -> 'T -> int = fun x y -> compare (fn y) (fn x)
 
     let inline F () : bool = false
 
