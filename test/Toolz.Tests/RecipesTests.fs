@@ -1,4 +1,4 @@
-﻿module RecipesTests
+﻿module Toolz.Tests.RecipesTests
 
 open System
 open Xunit

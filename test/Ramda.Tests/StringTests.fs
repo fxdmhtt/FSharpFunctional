@@ -1,4 +1,4 @@
-﻿module StringTests
+﻿module Ramda.Tests.StringTests
 
 open System
 open Xunit

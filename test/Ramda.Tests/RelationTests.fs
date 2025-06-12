@@ -1,4 +1,4 @@
-﻿module RelationTests
+﻿module Ramda.Tests.RelationTests
 
 open System
 open Xunit

@@ -1,4 +1,4 @@
-﻿module TypeTests
+﻿module Ramda.Tests.TypeTests
 
 open System
 open Xunit

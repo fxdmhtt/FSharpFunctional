@@ -1,4 +1,4 @@
-﻿module DicttoolzTests
+﻿module Toolz.Tests.DicttoolzTests
 
 open System
 open Xunit

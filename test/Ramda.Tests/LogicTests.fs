@@ -1,4 +1,4 @@
-﻿module LogicTests
+﻿module Ramda.Tests.LogicTests
 
 open System
 open Xunit

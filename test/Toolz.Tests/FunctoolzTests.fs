@@ -1,4 +1,4 @@
-﻿module FunctoolzTests
+﻿module Toolz.Tests.FunctoolzTests
 
 open System
 open Xunit

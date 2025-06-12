@@ -1,4 +1,4 @@
-﻿module MathTests
+﻿module Ramda.Tests.MathTests
 
 open System
 open Xunit

@@ -1,4 +1,4 @@
-﻿module FunctionTests
+﻿module Ramda.Tests.FunctionTests
 
 open System
 open Xunit

@@ -1,4 +1,4 @@
-﻿module ItertoolzTests
+﻿module Toolz.Tests.ItertoolzTests
 
 open System
 open Xunit
