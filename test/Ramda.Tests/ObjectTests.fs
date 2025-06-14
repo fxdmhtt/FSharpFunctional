@@ -113,33 +113,42 @@ let ``test_mergeRight`` () =
 
 [<Fact>]
 let ``test_mergeWith`` () =
-    mergeWith (@) (Map [ "a", [ 1 ]; "values", [ 10; 20 ] ]) (Map [ "b", [ 1 ]; "values", [ 15; 35 ] ])
-    |> should equal (Map [ "a", [ 1 ]; "b", [ 1 ]; "values", [ 10; 20; 15; 35 ] ])
+    mergeWith
+        (fun (a: obj) (b: obj) ->
+            match a, b with
+            | :? bool, _ -> a
+            | _, :? bool -> b
+            | (:? list<int> as la), (:? list<int> as lb) -> la @ lb
+            | _ -> failwith "error")
+        (Map [ "a", true; "values", [ 10; 20 ] ])
+        (Map [ "b", true; "values", [ 15; 35 ] ])
+    |> should equal (Map [ "a", true; "b", true; "values", [ 10; 20; 15; 35 ] ]: Map<string, obj>)
 
-// [<Fact>]
-// let ``test_mergeWithKey`` () =
-//     let concatValues =
-//         fun (k, l, r) ->
-//             if k = "values" then
-//                 (l :?> int list) @ (r :?> int list)
-//             else
-//                 r
+[<Fact>]
+let ``test_mergeWithKey`` () =
+    let concatValues: string -> obj -> obj -> obj =
+        fun k l r ->
+            if k = "values" then
+                (unbox<int list> l) @ (unbox<int list> r)
+            else
+                r
 
-//     mergeWithKey
-//         concatValues
-//         (Map [ "a", true; "thing", "foo"; "values", [ 10; 20 ] ])
-//         (Map [ "b", true; "thing", "bar"; "values", [ 15; 35 ] ])
-//     |> should equal (Map [ "a", true; "b", true; "thing", "bar"; "values", [ 10; 20; 15; 35 ] ])
+    mergeWithKey
+        concatValues
+        (Map [ "a", true; "thing", "foo"; "values", [ 10; 20 ] ])
+        (Map [ "b", true; "thing", "bar"; "values", [ 15; 35 ] ])
+    |> should equal (Map [ "a", true; "b", true; "thing", "bar"; "values", [ 10; 20; 15; 35 ] ]: Map<string, obj>)
 
-// [<Fact>]
-// let ``test_modify`` () =
-//     let person = Map [ "name", "James"; "age", 20; "pets", [ "dog"; "cat" ] ]
+[<Fact>]
+let ``test_modify`` () =
+    let person: Map<string, obj> =
+        Map [ "name", "James"; "age", 20; "pets", [ "dog"; "cat" ] ]
 
-//     modify "age" (add 1) person
-//     |> should equal (Map [ "name", "James"; "age", 21; "pets", [ "dog"; "cat" ] ])
+    modify "age" (unbox >> add 1 >> box) person
+    |> should equal (Map [ "name", "James"; "age", 21; "pets", [ "dog"; "cat" ] ]: Map<string, obj>)
 
-//     modify "pets" (append "turtle") person
-//     |> should equal (Map [ "name", "James"; "age", 20; "pets", [ "dog"; "cat"; "turtle" ] ])
+    modify "pets" (unbox<string list> >> append "turtle" >> box) person
+    |> should equal (Map [ "name", "James"; "age", 20; "pets", [ "dog"; "cat"; "turtle" ] ]: Map<string, obj>)
 
 [<Fact>]
 let ``test_objOf`` () =
@@ -182,14 +191,21 @@ let ``test_pickBy`` () =
     pickBy isUpperCase (Map [ "a", 1; "b", 2; "A", 3; "B", 4 ])
     |> should equal (Map [ "A", 3; "B", 4 ])
 
-// [<Fact>]
-// let ``test_project`` =
-//     let abby = Map [ "name", "Abby"; "age", 7; "hair", "blond"; "grade", 2 ]
-//     let fred = Map [ "name", "Fred"; "age", 12; "hair", "brown"; "grade", 7 ]
-//     let kids = [ abby; fred ]
+[<Fact>]
+let ``test_project`` =
+    let abby: Map<string, obj> =
+        Map [ "name", "Abby"; "age", 7; "hair", "blond"; "grade", 2 ]
 
-//     project [ "name"; "grade" ] kids
-//     |> should equal [ Map [ "name", "Abby"; "grade", 2 ]; Map [ "name", "Fred"; "grade", 7 ] ]
+    let fred: Map<string, obj> =
+        Map [ "name", "Fred"; "age", 12; "hair", "brown"; "grade", 7 ]
+
+    let kids = [ abby; fred ]
+
+    project [ "name"; "grade" ] kids
+    |> should
+        equal
+        [ (Map [ "name", "Abby"; "grade", 2 ]: Map<string, obj>)
+          (Map [ "name", "Fred"; "grade", 7 ]: Map<string, obj>) ]
 
 [<Fact>]
 let ``test_prop`` () =
@@ -198,70 +214,100 @@ let ``test_prop`` () =
     prop 0 [ 100 ] |> should equal (Some 100)
     (Option.map inc << prop "x") (Map [ "x", 3 ]) |> should equal (Some 4)
 
-// [<Fact>]
-// let ``test_propOr`` () =
-//     let alice = Map [ "name", "ALICE"; "age", 101 ]
-//     let favorite = prop "favoriteLibrary"
-//     let favoriteWithDefault = propOr "Ramda" "favoriteLibrary"
-//     favorite alice |> should equal None
-//     favoriteWithDefault alice |> should equal "Ramda"
+[<Fact>]
+let ``test_propOr`` () =
+    let alice = Map [ "name", "ALICE"; "age", "101" ]
+    let favorite = prop "favoriteLibrary"
+    let favoriteWithDefault = propOr "Ramda" "favoriteLibrary"
+    favorite alice |> should equal None
+    favoriteWithDefault alice |> should equal "Ramda"
 
-// [<Fact>]
-// let ``test_props`` () =
-//     props [ "x"; "y" ] (Map [ "x", 1; "y", 2 ]) |> should equal [ Some 1; Some 2 ]
+[<Fact>]
+let ``test_props`` () =
+    props [ "x"; "y" ] (Map [ "x", 1; "y", 2 ]) |> should equal [ 1; 2 ]
 
-//     props [ "c"; "a"; "b" ] (Map [ "b", 2; "a", 1 ])
-//     |> should equal [ None; Some 1; Some 2 ]
+    props [ "c"; "a"; "b" ] (Map [ "b", 2; "a", 1 ]) |> should equal [ 0; 1; 2 ]
 
-//     let fullName = (join " ") << (props [ "first"; "last" ])
+    let fullName = (join " ") << (props [ "first"; "last" ])
 
-//     fullName (Map [ "last", "Bullet-Tooth"; "age", 33; "first", "Tony" ])
-//     |> should equal "Tony Bullet-Tooth"
+    fullName (Map [ "last", "Bullet-Tooth"; "age", "33"; "first", "Tony" ])
+    |> should equal "Tony Bullet-Tooth"
 
-// [<Fact>]
-// let ``test_toPairs`` () =
-//     toPairs (Map [ "a", 1; "b", 2; "c", 3 ])
-//     |> should equal [ "a", 1; "b", 2; "c", 3 ]
+[<Fact>]
+let ``test_toPairs`` () =
+    toPairs (Map [ "a", 1; "b", 2; "c", 3 ])
+    |> should equal [ "a", 1; "b", 2; "c", 3 ]
 
-// [<Fact>]
-// let ``test_unwind`` () =
-//     unwind
-//         "hobbies"
-//         (Map
-//             [ "name", "alice"
-//               "hobbies", [ "Golf"; "Hacking" ]
-//               "colors", [ "red"; "green" ] ])
-//     |> should
-//         equal
-//         [ Map [ "name", "alice"; "hobbies", "Golf"; "colors", [ "red"; "green" ] ]
-//           Map [ "name", "alice"; "hobbies", "Hacking"; "colors", [ "red"; "green" ] ] ]
+[<Fact>]
+let ``test_unwind`` () =
+    unwind
+        "hobbies"
+        (Map
+            [ "name", "alice"
+              "hobbies", [ "Golf"; "Hacking" ]
+              "colors", [ "red"; "green" ] ]
+        : Map<string, obj>)
+    |> toList
+    |> should
+        equal
+        [ (Map [ "name", "alice"; "hobbies", "Golf"; "colors", [ "red"; "green" ] ]: Map<string, obj>)
+          (Map [ "name", "alice"; "hobbies", "Hacking"; "colors", [ "red"; "green" ] ]: Map<string, obj>) ]
 
-// [<Fact>]
-// let ``test_where`` () =
-//     let pred = where
-//         (Map [ "a", equals "foo"
-//                "b", complement (equals "bar")
-//                "x", flip gt 10
-//                "y", flip lt 20 ])
-//     pred (Map [ "a", "foo"; "b", "xxx"; "x", 11; "y", 19 ]) |> should equal true
-//     pred (Map [ "a", "xxx"; "b", "xxx"; "x", 11; "y", 19 ]) |> should equal false
-//     pred (Map [ "a", "foo"; "b", "bar"; "x", 11; "y", 19 ]) |> should equal false
-//     pred (Map [ "a", "foo"; "b", "xxx"; "x", 10; "y", 19 ]) |> should equal false
-//     pred (Map [ "a", "foo"; "b", "xxx"; "x", 11; "y", 20 ]) |> should equal false
+[<Fact>]
+let ``test_values`` () =
+    values (Map [ "a", 1; "b", 2; "c", 3 ]) |> toList |> should equal [ 1; 2; 3 ]
 
-// [<Fact>]
-// let ``test_whereAny`` () =
-//     let pred = whereAny
-//         (Map [ "a", equals "foo"
-//                "b", complement (equals "xxx")
-//                "x", flip gt 10
-//                "y", flip lt 20 ])
+[<Fact>]
+let ``test_where`` () =
+    let pred =
+        where (
+            Map
+                [ "a", unbox >> equals "foo"
+                  "b", unbox >> complement (equals "bar")
+                  "x", unbox >> flip gt 10
+                  "y", unbox >> flip lt 20 ]
+        )
 
-//     pred (Map [ "a", "foo"; "b", "xxx"; "x", 8; "y", 34 ]) |> should equal true
-//     pred (Map [ "a", "xxx"; "b", "xxx"; "x", 9; "y", 21 ]) |> should equal false
-//     pred (Map [ "a", "bar"; "b", "xxx"; "x", 10; "y", 20 ]) |> should equal false
-//     pred (Map [ "a", "foo"; "b", "bar"; "x", 10; "y", 20 ]) |> should equal true
-//     pred (Map [ "a", "foo"; "b", "xxx"; "x", 11; "y", 20 ]) |> should equal true
+    pred (Map [ "a", "foo"; "b", "xxx"; "x", 11; "y", 19 ]: Map<string, obj>)
+    |> should equal true
+
+    pred (Map [ "a", "xxx"; "b", "xxx"; "x", 11; "y", 19 ]: Map<string, obj>)
+    |> should equal false
+
+    pred (Map [ "a", "foo"; "b", "bar"; "x", 11; "y", 19 ]: Map<string, obj>)
+    |> should equal false
+
+    pred (Map [ "a", "foo"; "b", "xxx"; "x", 10; "y", 19 ]: Map<string, obj>)
+    |> should equal false
+
+    pred (Map [ "a", "foo"; "b", "xxx"; "x", 11; "y", 20 ]: Map<string, obj>)
+    |> should equal false
+
+[<Fact>]
+let ``test_whereAny`` () =
+    let pred =
+        whereAny (
+            Map
+                [ "a", unbox >> equals "foo"
+                  "b", unbox >> complement (equals "xxx")
+                  "x", unbox >> flip gt 10
+                  "y", unbox >> flip lt 20 ]
+        )
+
+    pred (Map [ "a", "foo"; "b", "xxx"; "x", 8; "y", 34 ]: Map<string, obj>)
+    |> should equal true
+
+    pred (Map [ "a", "xxx"; "b", "xxx"; "x", 9; "y", 21 ]: Map<string, obj>)
+    |> should equal false
+
+    pred (Map [ "a", "bar"; "b", "xxx"; "x", 10; "y", 20 ]: Map<string, obj>)
+    |> should equal false
+
+    pred (Map [ "a", "foo"; "b", "bar"; "x", 10; "y", 20 ]: Map<string, obj>)
+    |> should equal true
+
+    pred (Map [ "a", "foo"; "b", "xxx"; "x", 11; "y", 20 ]: Map<string, obj>)
+    |> should equal true
 
 [<Fact>]
 let ``test_whereEq`` () =

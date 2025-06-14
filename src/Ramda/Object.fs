@@ -106,7 +106,7 @@ module Object =
     let inline pickBy (pred: 'Value -> 'Key -> bool) (obj: Map<'Key, 'Value>) : Map<'Key, 'Value> =
         obj |> Map.filter (flip pred)
 
-    let inline project (props: '``Collection<'Key>``) (objs: Map<'Key, 'Value> seq) : Map<'Key, 'Value> seq =
+    let inline project (props: '``Collection<'Key>``) objs : '``Collection<Map<'Key, 'Value>>`` =
         objs |> map (pick props)
 
     let inline prop p obj = tryItem p obj
@@ -116,27 +116,25 @@ module Object =
         | None -> ``val``
         | Some v -> v
 
-    let inline props (ps: '``Collection<'Key>``) (obj: Map<'Key, 'Value>) : '``Collection<'Value>`` =
-        ps |> map (item obj)
+    let inline props ps (obj: Map<'Key, 'Value>) : '``Collection<'Value>`` =
+        ps |> map (flip tryItem obj >> Option.defaultValue Unchecked.defaultof<'Value>)
 
     let inline toPairs (obj: Map<'Key, 'Value>) : ('Key * 'Value) list = obj |> Map.toList
 
-    // let inline unwind (key:  'Key when 'Key: equality) (object: Map<'Key, 'Value>) : Map<'Key, 'Value> seq =
-    //     object
-    //     |> Map.toList
-    //     |> List.collect (fun (k, v) ->
-    //         match v with
-    //         | :? Map<'Key, 'Value> as v -> v |> Map.toList |> List.map (fun (k2, v2) -> k2, v2, k)
-    //         | _ -> [ k, v, key ])
-    //     |> List.map ()
+    let inline unwind (key: 'Key when 'Key: equality) (object: Map<'Key, 'Value>) : Map<'Key, 'Value> seq =
+        match Map.tryFind key object with
+        | Some values -> values |> unbox |> Seq.map (fun v -> object |> Map.add key v)
+        | None -> empty
 
     let inline values (obj: Map<'Key, 'Value>) : 'Value seq = obj.Values
 
     let inline where (spec: Map<'Key, 'Value -> bool>) (testObj: Map<'Key, 'Value>) : bool =
-        spec |> Map.forall (fun k f -> f (item k testObj))
+        spec
+        |> Map.forall (fun k f -> tryItem k testObj |> Option.map f |> Option.defaultValue false)
 
     let inline whereAny (spec: Map<'Key, 'Value -> bool>) (testObj: Map<'Key, 'Value>) : bool =
-        spec |> Map.exists (fun k f -> f (item k testObj))
+        spec
+        |> Map.exists (fun k f -> tryItem k testObj |> Option.map f |> Option.defaultValue false)
 
     let inline whereEq (spec: Map<'Key, 'Value>) (testObj: Map<'Key, 'Value>) : bool =
-        spec |> Map.forall (fun k v -> equals (item k testObj) v)
+        spec |> Map.mapValues equals |> flip where testObj
